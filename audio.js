@@ -1,36 +1,7 @@
-/* Процедурный звук без внешних файлов. iOS запускает аудио после нажатия Start. */
 class FilmAudio{
-  constructor(){this.ctx=null;this.master=null;this.enabled=false;this.ambient=null}
-  unlock(){
-    if(!this.ctx){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;this.ctx=new AC();this.master=this.ctx.createGain();this.master.gain.value=.48;this.master.connect(this.ctx.destination)}
-    if(this.ctx.state==="suspended")this.ctx.resume();
-  }
-  toggle(){this.unlock();this.enabled=!this.enabled;if(this.master)this.master.gain.setTargetAtTime(this.enabled?.48:0,this.ctx.currentTime,.12);if(this.enabled)this.startAmbient();else this.stopAmbient();return this.enabled}
-  tone(freq,dur,type="sine",vol=.08,slide=0){
-    if(!this.enabled||!this.ctx)return;
-    const o=this.ctx.createOscillator(),g=this.ctx.createGain(),t=this.ctx.currentTime;
-    o.type=type;o.frequency.setValueAtTime(freq,t);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(20,freq+slide),t+dur);
-    g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.04);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
-    o.connect(g);g.connect(this.master);o.start(t);o.stop(t+dur+.03);
-  }
-  noise(dur=1,vol=.08,filter=500){
-    if(!this.enabled||!this.ctx)return;
-    const n=Math.floor(this.ctx.sampleRate*dur),b=this.ctx.createBuffer(1,n,this.ctx.sampleRate),d=b.getChannelData(0);
-    for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*(.7+Math.random()*.3);
-    const s=this.ctx.createBufferSource(),f=this.ctx.createBiquadFilter(),g=this.ctx.createGain(),t=this.ctx.currentTime;
-    s.buffer=b;f.type="lowpass";f.frequency.value=filter;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
-    s.connect(f);f.connect(g);g.connect(this.master);s.start();
-  }
-  startAmbient(){if(!this.enabled||this.ambient)return;this.ambient=setInterval(()=>{this.tone(48+Math.random()*8,2.8,"sawtooth",.018,-10);if(Math.random()<.22)this.noise(.5,.035,900)},2600)}
-  stopAmbient(){clearInterval(this.ambient);this.ambient=null}
-  event(name){
-    if(!this.enabled)return;
-    if(name==="alarm"){this.tone(440,1.2,"sawtooth",.08,180);setTimeout(()=>this.tone(620,1.2,"sawtooth",.07,-180),600)}
-    if(name==="bang"){this.noise(.45,.22,180);this.tone(55,.5,"triangle",.13,-25)}
-    if(name==="radio"){this.noise(1.3,.12,1600);this.tone(880,.12,"square",.025)}
-    if(name==="steps"){this.noise(.16,.07,240);setTimeout(()=>this.noise(.16,.06,240),330)}
-    if(name==="growl"){this.tone(75,1.3,"sawtooth",.09,-38);this.noise(.8,.06,380)}
-    if(name==="metal"){this.tone(190,.7,"triangle",.12,-100);this.noise(.4,.06,700)}
-  }
-}
-window.filmAudio=new FilmAudio();
+constructor(){this.ctx=null;this.master=null;this.enabled=false}
+unlock(){if(!this.ctx){const A=window.AudioContext||window.webkitAudioContext;if(!A)return;this.ctx=new A();this.master=this.ctx.createGain();this.master.gain.value=0;this.master.connect(this.ctx.destination)}this.ctx.resume()}
+setEnabled(v){this.enabled=v;this.unlock();this.master.gain.setTargetAtTime(v?.7:0,this.ctx.currentTime,.25)}
+tone(f,d,type="sine",vol=.1,slide=0){if(!this.enabled||!this.ctx)return;const o=this.ctx.createOscillator(),g=this.ctx.createGain(),n=this.ctx.currentTime;o.type=type;o.frequency.setValueAtTime(f,n);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(20,f+slide),n+d);g.gain.setValueAtTime(.0001,n);g.gain.exponentialRampToValueAtTime(vol,n+.03);g.gain.exponentialRampToValueAtTime(.0001,n+d);o.connect(g);g.connect(this.master);o.start();o.stop(n+d+.03)}
+noise(d=.5,v=.1,cut=600){if(!this.enabled||!this.ctx)return;const b=this.ctx.createBuffer(1,this.ctx.sampleRate*d,this.ctx.sampleRate),a=b.getChannelData(0);for(let i=0;i<a.length;i++)a[i]=Math.random()*2-1;const s=this.ctx.createBufferSource(),f=this.ctx.createBiquadFilter(),g=this.ctx.createGain();s.buffer=b;f.type="lowpass";f.frequency.value=cut;g.gain.setValueAtTime(v,this.ctx.currentTime);g.gain.exponentialRampToValueAtTime(.0001,this.ctx.currentTime+d);s.connect(f);f.connect(g);g.connect(this.master);s.start()}
+event(n){if(!this.enabled)return;switch(n){case"alert":this.tone(480,1.5,"sawtooth",.12,220);setTimeout(()=>this.tone(690,1.1,"sawtooth",.1,-220),550);break;case"scream":this.tone(900,.6,"sawtooth",.08,-500);this.noise(.8,.1,1200);break;case"slam":this.noise(.45,.25,180);this.tone(60,.5,"triangle",.15,-30);break;case"wind":this.noise(2,.04,250);break;case"threat":this.tone(72,1.1,"sawtooth",.1,-28);break;case"creak":this.tone(180,1,"triangle",.1,-110);break;case"attack":this.noise(.6,.22,320);this.tone(48,.7,"sawtooth",.13,-20);break;case"engine":this.tone(55,2,"sawtooth",.1,80);break;case"rain":this.noise(3,.08,1500);break;case"heartbeat":this.tone(55,.25,"sine",.18,-10);setTimeout(()=>this.tone(48,.25,"sine",.16,-10),330);break;case"gate":this.noise(1.2,.16,450);this.tone(95,1.5,"triangle",.1,-50)}}}
