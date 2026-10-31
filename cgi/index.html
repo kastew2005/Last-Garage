@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#080a0d">
+<title>Последний гараж — CGI short film</title>
+<link rel="stylesheet" href="style.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+</head>
+<body>
+<div id="stage"></div>
+<div id="grain"></div><div id="vignette"></div>
+<section id="intro" class="overlay">
+  <div class="eyebrow">SHORT CGI FILM · 90 SECONDS</div>
+  <h1>ПОСЛЕДНИЙ<br><em>ГАРАЖ</em></h1>
+  <p>Когда убежище перестаёт быть безопасным.</p>
+  <button id="start">▶ &nbsp; ВОСПРОИЗВЕСТИ ФИЛЬМ</button>
+  <small>Лучше смотреть в полноэкранном режиме · звук включается после запуска</small>
+</section>
+<div id="hud" class="hidden">
+  <div class="topline"><span>ПОСЛЕДНИЙ ГАРАЖ</span><span id="timecode">00:00 / 01:30</span></div>
+  <div class="controls"><button id="pause">Ⅱ</button><button id="restart">↺</button><button id="sound">♫</button><button id="fullscreen">⛶</button><input id="seek" type="range" min="0" max="90" step="0.05" value="0" aria-label="Перемотка"></div>
+</div>
+<div id="caption"></div>
+<div id="end" class="overlay hidden"><div class="eyebrow">A SHORT FILM</div><h2>ЭТО ТОЛЬКО<br><em>НАЧАЛО…</em></h2><button id="again">ПОСМОТРЕТЬ ЕЩЁ РАЗ</button></div>
+<div id="loading">ЗАГРУЗКА СЦЕНЫ…</div>
+<script type="module" src="main.js"></script>
+</body></html>
